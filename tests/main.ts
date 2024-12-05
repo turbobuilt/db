@@ -127,8 +127,36 @@ export function toBinary(num, bits) {
 }
 
 
-
-let { binary, sortedKey, top50bits, bottom50bits } = Dictionary.compress("hello Yeshua loves you.");
+var msg = "hello Yeshua loves you. I am a super happy person and I have made a lot of mistakes in life.  But I'm doing much better.  Much, much better.  Are you?";
+let { binary, sortedKey, top50bits, bottom50bits } = Dictionary.compress(msg);
 console.log(binary, sortedKey, top50bits, bottom50bits);
+console.log(binary.length / 8, msg.length, sortedKey.join("").length);
 let decompressed = Dictionary.decompress(binary, sortedKey, top50bits, bottom50bits);
-console.log(decompressed);
+console.log("decomressed", decompressed);
+
+
+/**
+ * {header}
+ * 
+ */
+
+/**
+ * {data chunk bytes}
+ * [0] - known byte. 0 for new token 1 for existing token
+ * - if 0, [**] - {new_token_data}
+ *   {new_token_data}
+ *     [1] remember bit
+ *     [2-length_key_size] - token length key. This consults the token_length_dict to map a length_id to a length
+ *     [(length_key_size+1)-(length+1)] - token
+ * - if 1, [**] - {token_info}
+ *   {token_info}
+ *     [0] - 0 for token uses smaller amount of bits, 1 for token uses larger amount of bits
+ *     [1] - forget bit
+ *     [1-n] - token id
+ * 
+ * to compress:  
+ *   1. go through data and compute all the tokens and put in array.
+ *   2. Then you split them in half by frequency. smallerHalf, largerHalf
+ *   3. You compute how many bits it takes to store the halves: ceil(log2([smaller/larger]Half.length))
+ *   4. 
+ */
